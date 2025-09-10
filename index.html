@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Consulta de palabras</h1>
+    <input type="text" id="wordInput" placeholder="Escribe una palabra en ingles">
+    <button onclick="buscarPalabra()">Buscar</button>
+    <div id="resultado"></div>
+
+    <script>
+        function buscarPalabra() {
+            const palabra = document.getElementById('wordInput').value.trim();
+            const resultadoDiv = document.getElementById('resultado');
+            resultadoDiv.innerHTML = 'Buscando...';
+
+            fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${palabra}?translations=true&pretty=true`)
+                .then(response => response.json())
+                .then(data => {
+                    if (Array.isArray(data)) {
+                        const definiciones = data[0].meanings.map(m => 
+                            `<li><strong>${m.partOfSpeech}:</strong> ${m.definitions[0].definition}</li>`
+                        ).join('');
+                        resultadoDiv.innerHTML = `<ul>${definiciones}</ul>`;
+                    } else {
+                        resultadoDiv.innerHTML = 'Palabra no encontrada.';
+                    }
+                })
+                .catch(() => {
+                    resultadoDiv.innerHTML = 'Error al consultar la API.';
+                });
+        }
+    </script>
+</body>
+</html>
